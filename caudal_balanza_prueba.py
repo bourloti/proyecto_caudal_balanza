@@ -3,20 +3,28 @@ from snap7.util import get_real, get_bool, get_byte
 from time import sleep
 from datetime import datetime
 import pandas as pd
+import os
 
 # Completa los archvos csv pasandole un diccionario con las keys que son nombres de balanzas y los values son dataframe
-def crear_archivos_csv(diccionario):
 
-    # Iterar sobre el diccionario para guardar cada DataFrame en un archivo CSV
-    for key, df in diccionario.items():
-        # Crear el nombre del archivo usando la clave
-        nombre_archivo = f"caudal_{key}.csv"
-        
+class ArchivoCSV:
+    def __init__(self, nombre_archivo = str):
+        self.nombre_archivo = nombre_archivo
+    
         # Guardar el DataFrame en el archivo correspondiente
-        df.to_csv(nombre_archivo, mode='a', header=False, index=False)
-        print(f"Guardado en {nombre_archivo}")
+    def crear_csv(self, df):
 
-class CaudalBalanzas:
+        # Verifica si el archivo existe
+        if not os.path.exists(self.nombre_archivo):
+            # Si el archivo no existe, crea uno nuevo con los datos
+            pd.DataFrame({'fecha': [], 'caudal': []}).to_csv(self.nombre_archivo, index=False)
+            print(f"El archivo {self.nombre_archivo} fue creado y los datos fueron agregados.")
+        else:
+            # Si el archivo ya existe, agrega los nuevos datos al final
+            df.to_csv(self.nombre_archivo, mode='a', header=False, index=False)
+            print(f"Guardado en {self.nombre_archivo}")
+
+'''class CaudalBalanzas:
     def __init__(self, id_balanza):
         self.id_balanza = id_balanza
         self.acumulado_anterior = {}
@@ -33,10 +41,22 @@ class CaudalBalanzas:
         # Crea un DataFrame con la fecha y los kilos
         df = pd.DataFrame({'fecha': [datetime.now()], 'caudal': [kilos]})
 
-        # Crea un diccionario con un key de identificacion y el dataframe del objeto creado
-        balanzas = {self.id_balanza: df}
+        return df'''
+        
+class CaudalBalanzas:
+    def __init__(self):
+        self.acumulado_anterior = 0
 
-        return balanzas
+    def obtiene_caudal(self, acumulado):
+
+        # Calcula los kilogramas entre un llamado y el otro
+        kilos = acumulado - self.acumulado_anterior
+        self.acumulado_anterior = acumulado  # Actualizar el valor de acumulado_anterior
+
+        # Crea un DataFrame con la fecha y los kilos
+        df = pd.DataFrame({'fecha': [datetime.now()], 'caudal': [kilos]})
+
+        return df
 
 # Intentar conectar en un bucle hasta tener éxito
 def connect_to_plc(ip, rack, slot):
@@ -67,8 +87,11 @@ def main():
         kilos_acumulados_balanza_ingreso_materia_prima = 0
         kilos_acumulado_balanza_tempering = 0
 
-        caudal_ingreso_matreia_prima = CaudalBalanzas('balanza_1')
-        caudal_tempering = CaudalBalanzas('balanza_2')
+        caudal_ingreso_matreia_prima = CaudalBalanzas()
+        caudal_tempering = CaudalBalanzas()
+        
+        csv_balanza_ingreso_materia_prima = ArchivoCSV('caudal_balanza_ingreso_materia_prima.csv')
+        csv_balanza_tempering = ArchivoCSV('caudal_balanza_tempering.csv')
 
         while True:
             try:
@@ -92,8 +115,12 @@ def main():
 #-------------------------------------------------------------------------------------------------------------------------------
                 #Cada 1 minuto ejecuta lo que hay dentro del if
                 if datetime.now().second == 00:
-                    crear_archivos_csv(caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima))
-                    crear_archivos_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
+                    caudal_ingreso_maetria_prima = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
+                    csv_balanza_ingreso_materia_prima.crear_csv(caudal_ingreso_maetria_prima)
+                    
+                    csv_balanza_tempering.crear_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
+                    
+                    #crear_archivos_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
                     #id_balanza['balanza_1'] = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
                     # id_balanza['balanza_2'] = obtiene_caudal_kilos_por_minuto(kilos_acumulado_balanza_tempering, 'balanza_2')
                     # id_balanza['balanza_3'] = obtiene_caudal_kilos_por_minuto(kilos_acumulado_balanza_silo_101, 'balanza_3')
