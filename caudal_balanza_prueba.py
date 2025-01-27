@@ -11,7 +11,7 @@ class ArchivoCSV:
     def __init__(self, nombre_archivo = str):
         self.nombre_archivo = nombre_archivo
     
-        # Guardar el DataFrame en el archivo correspondiente
+    # Guardar el DataFrame en el archivo correspondiente
     def crear_csv(self, df):
 
         # Verifica si el archivo existe
@@ -23,25 +23,6 @@ class ArchivoCSV:
             # Si el archivo ya existe, agrega los nuevos datos al final
             df.to_csv(self.nombre_archivo, mode='a', header=False, index=False)
             print(f"Guardado en {self.nombre_archivo}")
-
-'''class CaudalBalanzas:
-    def __init__(self, id_balanza):
-        self.id_balanza = id_balanza
-        self.acumulado_anterior = {}
-
-    def obtiene_caudal(self, acumulado):
-        # Si la balanza no tiene un acumulado anterior, lo inicializamos
-        if self.id_balanza not in self.acumulado_anterior:
-            self.acumulado_anterior[self.id_balanza] = acumulado
-
-        # Calcula los kilogramas entre un llamado y el otro
-        kilos = acumulado - self.acumulado_anterior[self.id_balanza]
-        self.acumulado_anterior[self.id_balanza] = acumulado  # Actualizar el valor de acumulado_anterior
-
-        # Crea un DataFrame con la fecha y los kilos
-        df = pd.DataFrame({'fecha': [datetime.now()], 'caudal': [kilos]})
-
-        return df'''
         
 class CaudalBalanzas:
     def __init__(self):
@@ -80,12 +61,8 @@ def connect_to_plc(ip, rack, slot):
 
 def main():
     try:
-        # plc_molino = connect_to_plc("10.100.100.10", 0, 3)
-        # #Diccionario con balanzas que se estan leyendo
-
-        segundos = 0
-        kilos_acumulados_balanza_ingreso_materia_prima = 0
-        kilos_acumulado_balanza_tempering = 0
+        plc_molino = connect_to_plc("10.100.100.10", 0, 3)
+        #Diccionario con balanzas que se estan leyendo
 
         caudal_ingreso_matreia_prima = CaudalBalanzas()
         caudal_tempering = CaudalBalanzas()
@@ -96,35 +73,27 @@ def main():
         while True:
             try:
                 # Verificar si el PLC sigue conectado
-                # if not plc_molino.get_connected():
-                #     print("Se perdió la conexión con el PLC. Reintentando...")
-                #     plc_molino = connect_to_plc("10.100.100.10", 0, 3)
+                if not plc_molino.get_connected():
+                    print("Se perdió la conexión con el PLC. Reintentando...")
+                    plc_molino = connect_to_plc("10.100.100.10", 0, 3)
 
                 #Leo los datos del PLC de las balanzas
                 '''
                     Con db_read obtengo el numero real, le paso 3 parametros: numeroDB,direccionDeArranque,cuantosByteLee
                 '''
-                if datetime.now().second == segundos:
-                    kilos_acumulados_balanza_ingreso_materia_prima += 45
-                    kilos_acumulado_balanza_tempering += 78
-                # kilos_acumulados_balanza_ingreso_materia_prima = round(get_real(plc_molino.db_read(150,8,4),0),1)
+                kilos_acumulados_balanza_ingreso_materia_prima = round(get_real(plc_molino.db_read(150,8,4),0),1)
                 # kilos_acumulado_balanza_silo_101 = round(get_real(plc_molino.db_read(157,8,4),0),1)
-                # kilos_acumulado_balanza_tempering = round(get_real(plc_molino.db_read(164,8,4),0),1)
+                kilos_acumulado_balanza_tempering = round(get_real(plc_molino.db_read(164,8,4),0),1)
                 # kilos_acumulado_balanza_tempering_dudoso = round(get_real(plc_molino.db_read(158,8,4),0),1)
 
 #-------------------------------------------------------------------------------------------------------------------------------
-                #Cada 1 minuto ejecuta lo que hay dentro del if
+                # Para obtener el caudal por minuto de las balanzas, este if se debe ejecutar cada 1 min
                 if datetime.now().second == 00:
                     caudal_ingreso_maetria_prima = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
                     csv_balanza_ingreso_materia_prima.crear_csv(caudal_ingreso_maetria_prima)
                     
                     csv_balanza_tempering.crear_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
-                    
-                    #crear_archivos_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
-                    #id_balanza['balanza_1'] = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
-                    # id_balanza['balanza_2'] = obtiene_caudal_kilos_por_minuto(kilos_acumulado_balanza_tempering, 'balanza_2')
-                    # id_balanza['balanza_3'] = obtiene_caudal_kilos_por_minuto(kilos_acumulado_balanza_silo_101, 'balanza_3')
-                    # id_balanza['balanza_4'] = obtiene_caudal_kilos_por_minuto(kilos_acumulado_balanza_tempering_dudoso, 'balanza_4')
+
                     sleep(1.5)
 #-------------------------------------------------------------------------------------------------------------------------------
                 sleep(0.1)
@@ -132,13 +101,12 @@ def main():
             except Exception as e:
                 print(f"Error durante la operación: {e}")
                 print("Intentando reconectar...")
-                #plc_molino = connect_to_plc("10.100.100.10", 0, 3)
+                plc_molino = connect_to_plc("10.100.100.10", 0, 3)
 
     except KeyboardInterrupt:
         # print("Comunicación Snap7 finalizada.")
-        # plc_molino.disconnect()
-        # print("Conexión cerrada.")
-        pass
+        plc_molino.disconnect()
+        print("Conexión cerrada.")
 
 if __name__ == "__main__":
     main()

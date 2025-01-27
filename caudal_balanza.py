@@ -92,7 +92,7 @@ def main():
             except Exception as e:
                 print(f"Error durante la operación: {e}")
                 print("Intentando reconectar...")
-                #plc_molino = connect_to_plc("10.100.100.10", 0, 3)
+                plc_molino = connect_to_plc("10.100.100.10", 0, 3)
 
     except KeyboardInterrupt:
         print("Comunicación Snap7 finalizada.")
