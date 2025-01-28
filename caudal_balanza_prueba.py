@@ -5,8 +5,7 @@ from datetime import datetime
 import pandas as pd
 import os
 
-# Completa los archvos csv pasandole un diccionario con las keys que son nombres de balanzas y los values son dataframe
-
+# Crea un archivo CSV, pasandole un nombre y en el metodo se le pasa un dataframe con los valores
 class ArchivoCSV:
     def __init__(self, nombre_archivo = str):
         self.nombre_archivo = nombre_archivo
@@ -24,6 +23,7 @@ class ArchivoCSV:
             df.to_csv(self.nombre_archivo, mode='a', header=False, index=False)
             print(f"Guardado en {self.nombre_archivo}")
         
+# Obtiene el caudal de las balanzas , pasandole el valor acumulado proveniente del PLC 
 class CaudalBalanzas:
     def __init__(self):
         self.acumulado_anterior = 0
@@ -64,11 +64,32 @@ def main():
         plc_molino = connect_to_plc("10.100.100.10", 0, 3)
         #Diccionario con balanzas que se estan leyendo
 
+        # Objetos - Planta parboil
         caudal_ingreso_matreia_prima = CaudalBalanzas()
         caudal_tempering = CaudalBalanzas()
-        
+        caudal_silo_101 = CaudalBalanzas()
+
         csv_balanza_ingreso_materia_prima = ArchivoCSV('caudal_balanza_ingreso_materia_prima.csv')
         csv_balanza_tempering = ArchivoCSV('caudal_balanza_tempering.csv')
+        csv_balanza_silo_101 = ArchivoCSV('caudal_balanza_silo_101.csv')
+
+        # Objetos - Molino Parboil
+        caudal_ingreso_molino_parboil = CaudalBalanzas()
+        caudal_final_molino_parboil = CaudalBalanzas()
+        caudal_integral_molino_parboil = CaudalBalanzas()
+
+        csv_ingreso_molino_parboil = ArchivoCSV('caudal_balanza_ingreso_molino_parboil.csv')
+        csv_final_molino_parboil = ArchivoCSV('caudal_balanza_final_molino_parboil.csv')
+        csv_integral_molino_parboil = ArchivoCSV('caudal_balanza_integral_molino_parboil.csv')
+
+        # Objetos - Molino Blanco
+        caudal_ingreso_molino_blanco = CaudalBalanzas()
+        caudal_final_molino_blanco = CaudalBalanzas()
+        caudal_integral_molino_blanco = CaudalBalanzas()
+
+        csv_ingreso_molino_blanco = ArchivoCSV('caudal_balanza_ingreso_molino_blanco.csv')
+        csv_final_molino_blanco = ArchivoCSV('caudal_balanza_final_molino_blanco.csv')
+        csv_integral_molino_blanco = ArchivoCSV('caudal_balanza_integral_molino_blanco.csv')
 
         while True:
             try:
@@ -81,18 +102,40 @@ def main():
                 '''
                     Con db_read obtengo el numero real, le paso 3 parametros: numeroDB,direccionDeArranque,cuantosByteLee
                 '''
+                # Datos Planta Parboil
                 kilos_acumulados_balanza_ingreso_materia_prima = round(get_real(plc_molino.db_read(150,8,4),0),1)
-                # kilos_acumulado_balanza_silo_101 = round(get_real(plc_molino.db_read(157,8,4),0),1)
+                kilos_acumulado_balanza_silo_101 = round(get_real(plc_molino.db_read(157,8,4),0),1)
                 kilos_acumulado_balanza_tempering = round(get_real(plc_molino.db_read(164,8,4),0),1)
-                # kilos_acumulado_balanza_tempering_dudoso = round(get_real(plc_molino.db_read(158,8,4),0),1)
 
+                # Datos Molino Parboil
+                kilos_acumulados_balanza_ingreso_molino_parboil = round(get_real(plc_molino.db_read(163,8,4),0),1)
+                kilos_acumulado_balanza_final_molino_parboil = round(get_real(plc_molino.db_read(158,8,4),0),1)
+                kilos_acumulado_balanza_integral_molino_parboil = round(get_real(plc_molino.db_read(161,8,4),0),1)
+
+                # Datos Molino Parboil
+                kilos_acumulados_balanza_ingreso_molino_blanco = round(get_real(plc_molino.db_read(152,8,4),0),1)
+                kilos_acumulado_balanza_final_molino_blanco = round(get_real(plc_molino.db_read(153,8,4),0),1)
+                kilos_acumulado_balanza_integral_molino_blanco = round(get_real(plc_molino.db_read(159,8,4),0),1)
 #-------------------------------------------------------------------------------------------------------------------------------
                 # Para obtener el caudal por minuto de las balanzas, este if se debe ejecutar cada 1 min
                 if datetime.now().second == 00:
+
+                    # Generacion archivos CSV planta parboil
                     caudal_ingreso_maetria_prima = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
                     csv_balanza_ingreso_materia_prima.crear_csv(caudal_ingreso_maetria_prima)
-                    
+
+                    csv_balanza_silo_101.crear_csv(caudal_silo_101.obtiene_caudal(kilos_acumulado_balanza_silo_101))
                     csv_balanza_tempering.crear_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
+
+                    # Generacion archivos CSV planta parboil
+                    csv_ingreso_molino_parboil.crear_csv(caudal_ingreso_molino_parboil.obtiene_caudal(kilos_acumulados_balanza_ingreso_molino_parboil))
+                    csv_final_molino_parboil.crear_csv(caudal_final_molino_parboil.obtiene_caudal(kilos_acumulado_balanza_final_molino_parboil))
+                    csv_integral_molino_parboil.crear_csv(caudal_integral_molino_parboil.obtiene_caudal(kilos_acumulado_balanza_integral_molino_parboil))
+
+                    # Generacion archivos CSV planta parboil
+                    csv_ingreso_molino_blanco.crear_csv(caudal_ingreso_molino_blanco.obtiene_caudal(kilos_acumulados_balanza_ingreso_molino_blanco))
+                    csv_final_molino_blanco.crear_csv(caudal_final_molino_blanco.obtiene_caudal(kilos_acumulado_balanza_final_molino_blanco))
+                    csv_integral_molino_blanco.crear_csv(caudal_integral_molino_blanco.obtiene_caudal(kilos_acumulado_balanza_integral_molino_blanco)) 
 
                     sleep(1.5)
 #-------------------------------------------------------------------------------------------------------------------------------
