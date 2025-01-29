@@ -92,7 +92,7 @@ def graficar(df, toneladas_totales):
 
 if __name__ == "__main__":
     df,ton = analisis('C:\Python Nacho\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_integral_molino_blanco.csv', '29/01/2025')
-    graficar(df,ton)
+    graficar(df,ton) 
     # while True:
     #     if str(datetime.now().strftime("%H:%M:%S")) == '05:13:30':
     #         fecha_formateada = (datetime.now() - timedelta(days=1)).strftime("%d/%m/%Y")
