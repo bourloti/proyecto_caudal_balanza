@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 from matplotlib.dates import DateFormatter
 
 # Leer el archivo CSV
-df_1 = pd.read_csv('proyecto_caudal_balanza\\caudal_balanza_ingreso_materia_prima.csv', sep=',')  # Ajusta el nombre del archivo y el separador si es necesario
-df_2 = pd.read_csv('proyecto_caudal_balanza\\Trending_planta.csv', sep=';')  # Ajusta el nombre del archivo y el separador si es necesario
+df_1 = pd.read_csv('caudal_balanza_integral_molino_blanco.csv', sep=',')  # Ajusta el nombre del archivo y el separador si es necesario
+df_2 = pd.read_csv('Trending_MB.csv', sep=';')  # Ajusta el nombre del archivo y el separador si es necesario
 
 nombre_columna_tiempo_df_1 = 'fecha'
-nombre_columna_tiempo_df_2 = 'Ingreso Materia Prima Time'
+nombre_columna_tiempo_df_2 = 'Integral Time'
 
 nombre_columna_caudal_df_1 = 'caudal'
-nombre_columna_caudal_df_2 = 'Ingreso Materia Prima ValueY'
+nombre_columna_caudal_df_2 = 'Integral ValueY'
 
 df_1[nombre_columna_tiempo_df_1] = df_1[nombre_columna_tiempo_df_1].replace({'-': '/'}, regex=True)
 df_2[nombre_columna_tiempo_df_2] = df_2[nombre_columna_tiempo_df_2].replace({'a.m.': 'AM', 'p.m.': 'PM'}, regex=True)
@@ -31,19 +31,19 @@ df_nuevo = pd.DataFrame({'fecha': df_1['fecha'], 'caudal': df_1['caudal']})
 df_nuevo_trending_mb = pd.DataFrame({'fecha': df_2[nombre_columna_tiempo_df_2], 'caudal': df_2[nombre_columna_caudal_df_2]})
 
 # Definir las fechas de inicio y fin que quieres filtrar
-fecha_inicio = '2025-01-27 03:51:00'
-fecha_fin = '2025-01-27 04:51:00'
+fecha_inicio = '2025-01-29 00:00:00'
+fecha_fin = '2025-01-29 02:00:00'
 
 # Filtrar el DataFrame entre esas fechas
-df_filtrado_1 = df_nuevo[(df_nuevo['fecha'] >= fecha_inicio) & (df_nuevo['fecha'] <= fecha_fin)]
-df_filtrado_2 = df_nuevo_trending_mb[(df_nuevo_trending_mb['fecha'] >= '27/01/2025 03:55:00 AM') & (df_nuevo_trending_mb['fecha'] <= '27/01/2025 04:55:00 AM')]
+df_filtrado_1 = df_nuevo[df_nuevo['fecha'].between(fecha_inicio, fecha_fin)]
+df_filtrado_2 = df_nuevo_trending_mb[df_nuevo_trending_mb['fecha'].between('29-01-2025 00:03:00', '29-01-2025 02:03:00')]
 
 # Mostrar el DataFrame filtrado
 print((df_filtrado_1['caudal'].mean()*59)/1000)
-print(df_filtrado_1['caudal'].count())
+# print(df_filtrado_1['caudal'].count())
 
 print(df_filtrado_2['caudal'].mean())
-print(df_filtrado_2['caudal'].count())
+# print(df_filtrado_2['caudal'].count())
 
 '''
 # Graficar la temperatura en función de la fecha y hora
