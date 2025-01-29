@@ -7,20 +7,21 @@ import os
 
 # Crea un archivo CSV, pasandole un nombre y en el metodo se le pasa un dataframe con los valores
 class ArchivoCSV:
-    def __init__(self, nombre_archivo = str):
+    def __init__(self, nombre_archivo, directorio):
         self.nombre_archivo = nombre_archivo
+        self.directorio = directorio
     
     # Guardar el DataFrame en el archivo correspondiente
     def crear_csv(self, df):
 
         # Verifica si el archivo existe
-        if not os.path.exists(self.nombre_archivo):
+        if not os.path.exists(f'{self.directorio}/{self.nombre_archivo}'):
             # Si el archivo no existe, crea uno nuevo con los datos
-            pd.DataFrame({'fecha': [], 'caudal': []}).to_csv(self.nombre_archivo, index=False)
+            pd.DataFrame({'fecha': [], 'caudal': []}).to_csv(f'{self.directorio}/{self.nombre_archivo}', index=False)
             print(f"El archivo {self.nombre_archivo} fue creado y los datos fueron agregados.")
         else:
             # Si el archivo ya existe, agrega los nuevos datos al final
-            df.to_csv(self.nombre_archivo, mode='a', header=False, index=False)
+            df.to_csv(f'{self.directorio}/{self.nombre_archivo}', mode='a', header=False, index=False)
             print(f"Guardado en {self.nombre_archivo}")
         
 # Obtiene el caudal de las balanzas , pasandole el valor acumulado proveniente del PLC 
@@ -69,27 +70,27 @@ def main():
         caudal_tempering = CaudalBalanzas()
         caudal_silo_101 = CaudalBalanzas()
 
-        csv_balanza_ingreso_materia_prima = ArchivoCSV('caudal_balanza_ingreso_materia_prima.csv')
-        csv_balanza_tempering = ArchivoCSV('caudal_balanza_tempering.csv')
-        csv_balanza_silo_101 = ArchivoCSV('caudal_balanza_silo_101.csv')
+        csv_balanza_ingreso_materia_prima = ArchivoCSV('caudal_balanza_ingreso_materia_prima.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+        csv_balanza_tempering = ArchivoCSV('caudal_balanza_tempering.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+        csv_balanza_silo_101 = ArchivoCSV('caudal_balanza_silo_101.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
 
         # Objetos - Molino Parboil
         caudal_ingreso_molino_parboil = CaudalBalanzas()
         caudal_final_molino_parboil = CaudalBalanzas()
         caudal_integral_molino_parboil = CaudalBalanzas()
 
-        csv_ingreso_molino_parboil = ArchivoCSV('caudal_balanza_ingreso_molino_parboil.csv')
-        csv_final_molino_parboil = ArchivoCSV('caudal_balanza_final_molino_parboil.csv')
-        csv_integral_molino_parboil = ArchivoCSV('caudal_balanza_integral_molino_parboil.csv')
+        csv_ingreso_molino_parboil = ArchivoCSV('caudal_balanza_ingreso_molino_parboil.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+        csv_final_molino_parboil = ArchivoCSV('caudal_balanza_final_molino_parboil.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+        csv_integral_molino_parboil = ArchivoCSV('caudal_balanza_integral_molino_parboil.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
 
         # Objetos - Molino Blanco
         caudal_ingreso_molino_blanco = CaudalBalanzas()
         caudal_final_molino_blanco = CaudalBalanzas()
         caudal_integral_molino_blanco = CaudalBalanzas()
 
-        csv_ingreso_molino_blanco = ArchivoCSV('caudal_balanza_ingreso_molino_blanco.csv')
-        csv_final_molino_blanco = ArchivoCSV('caudal_balanza_final_molino_blanco.csv')
-        csv_integral_molino_blanco = ArchivoCSV('caudal_balanza_integral_molino_blanco.csv')
+        csv_ingreso_molino_blanco = ArchivoCSV('caudal_balanza_ingreso_molino_blanco.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+        csv_final_molino_blanco = ArchivoCSV('caudal_balanza_final_molino_blanco.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+        csv_integral_molino_blanco = ArchivoCSV('caudal_balanza_integral_molino_blanco.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
 
         while True:
             try:
@@ -109,7 +110,7 @@ def main():
 
                 # Datos Molino Parboil
                 kilos_acumulados_balanza_ingreso_molino_parboil = round(get_real(plc_molino.db_read(163,8,4),0),1)
-                kilos_acumulado_balanza_final_molino_parboil = round(get_real(plc_molino.db_read(158,8,4),0),1)
+                kilos_acumulado_balanza_final_molino_parboil = (round(get_real(plc_molino.db_read(158,8,4),0),1)) / 10
                 kilos_acumulado_balanza_integral_molino_parboil = round(get_real(plc_molino.db_read(161,8,4),0),1)
 
                 # Datos Molino Parboil
