@@ -9,6 +9,7 @@ class AcondicionadorCSV:
     """
     Esta clase se encarga de acondicionar (limpiar y preparar) el archivo CSV,
     realizando tareas como la conversión de tipos de datos y filtrado de valores.
+    Devuelve un DataFrame con los valores leidos del CSV
     """
     def __init__(self, directorio_archivo_csv):
         self.directorio_archivo_csv = directorio_archivo_csv
@@ -160,8 +161,11 @@ class GeneraArchivoCSV:
             df.to_csv(f'{self.directorio}/{self.nombre_archivo}', mode='a', header=False, index=False)
             print(f"Guardado en {self.nombre_archivo}")
 
-def generar_csv_balanzas_totalizadores(df_dia, titulo):
-    # Genera un dataframe con los valores por hora de todas las balanzas, y lo convierte a CSV
+def generar_df_totalizadores_balanzas(df_dia, titulo):
+    '''
+    Genera un dataframe con los valores por hora de todas las balanzas, y lo convierte a CSV
+    '''
+    
     # Inicializa el diccionario vacío
     diccionario_balanzas = {}
 
@@ -232,11 +236,11 @@ def main():
                         continue
             
                 # Si los datos fueron calculados correctamente, graficar los resultados
-                # for i in range(len(df_dia_graficos)):
-                #     graficador = Graficador(df_dia_graficos[i], titulos_graficos[i].upper())
-                #     graficador.graficar(fecha_formateada)
+                for i in range(len(df_dia_graficos)):
+                    graficador = Graficador(df_dia_graficos[i], titulos_graficos[i].upper())
+                    graficador.graficar(fecha_formateada)
                 
-                df_totalizadores_balanzas = generar_csv_balanzas_totalizadores(df_dia_graficos, titulos_graficos)
+                df_totalizadores_balanzas = generar_df_totalizadores_balanzas(df_dia_graficos, titulos_graficos)
                 totalizadores_por_hora = GeneraArchivoCSV('totalizadores_todas_balanzas.csv', 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza')
                 totalizadores_por_hora.crear_csv(df_totalizadores_balanzas) 
                       
