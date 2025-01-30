@@ -122,8 +122,8 @@ def main():
                 if datetime.now().second == 00:
 
                     # Generacion archivos CSV planta parboil
-                    caudal_ingreso_maetria_prima = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
-                    csv_balanza_ingreso_materia_prima.crear_csv(caudal_ingreso_maetria_prima)
+                    df_caudal_ingreso_maetria_prima = caudal_ingreso_matreia_prima.obtiene_caudal(kilos_acumulados_balanza_ingreso_materia_prima)
+                    csv_balanza_ingreso_materia_prima.crear_csv(df_caudal_ingreso_maetria_prima)
 
                     csv_balanza_silo_101.crear_csv(caudal_silo_101.obtiene_caudal(kilos_acumulado_balanza_silo_101))
                     csv_balanza_tempering.crear_csv(caudal_tempering.obtiene_caudal(kilos_acumulado_balanza_tempering))
