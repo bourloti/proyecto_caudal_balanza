@@ -1,4 +1,5 @@
 import snap7
+from time import sleep
 
 # Intentar conectar en un bucle hasta tener éxito
 def connect_to_plc(ip, rack, slot):

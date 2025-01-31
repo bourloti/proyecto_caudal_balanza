@@ -42,6 +42,7 @@ class CalculadorToneladasDia:
 
                 # Crear un DataFrame con las fechas y toneladas calculadas
                 df_final = pd.DataFrame({'fecha': lista_fecha_hora, 'totalizador': lista_prom_toneladas})
+
                 return df_final
             else:
                 print(f"Fecha {fecha} no encontrada en los datos.")

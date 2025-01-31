@@ -13,19 +13,22 @@ def main():
         
         # Diccionario con los nombre de las balanzas y las rutas con archivos CSV
         archivos = {
-            'balanza_final_mb': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_final_molino_blanco.csv',
-            'balanza_ingreso_mb': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_molino_blanco.csv',
-            'balanza_integral_mb': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_integral_molino_blanco.csv',
-            'balanza_final_mp': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_final_molino_parboil.csv',
-            'balanza_ingreso_mp': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_molino_parboil.csv',
-            'balanza_integral_mp': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_integral_molino_parboil.csv',
-            'balanza_silo_101': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_silo_101.csv',
-            'balanza_tempering': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_tempering.csv',
-            'balanza_materia_prima': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_materia_prima.csv'
+            'balanza_final_mb': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_final_molino_blanco.csv',
+            'balanza_ingreso_mb': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_molino_blanco.csv',
+            'balanza_integral_mb': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_integral_molino_blanco.csv',
+            'balanza_final_mp': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_final_molino_parboil.csv',
+            'balanza_ingreso_mp': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_molino_parboil.csv',
+            'balanza_integral_mp': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_integral_molino_parboil.csv',
+            'balanza_silo_101': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_silo_101.csv',
+            'balanza_tempering': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_tempering.csv',
+            'balanza_materia_prima': 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_materia_prima.csv'
         }
-                
+        # Crea un diccionariob a partir del diccionario "archivo", donde el key es el nombre de la balanza y el value es un dataFrame con los objetos de la clase "CaudalBalanzas"
         objetos_caudal_balanzas = {nombre_balanza: CaudalBalanzas() for nombre_balanza in archivos.keys()}
+
         
+        # Crea un diccionariob a partir del diccionario "archivo", donde el key es el nombre de la balanza y el value es un dataFrame con los objetos de la clase "GenerarArchivoCSV"
+        # La funcion os.path.split(ruta), se le pasa la ruta de un archivo y devuelve una tupla con dos valores: uno el directorio del archivo y el otro el nombre, 
         objetos_genera_CSV_balanzas = {nombre_balanza: GenerarArchivoCSV(os.path.split(ruta)[1], os.path.split(ruta)[0]) for nombre_balanza, ruta in archivos.items()}
         
         while True:
@@ -64,9 +67,9 @@ def main():
                 }
                 
 #-------------------------------------------------------------------------------------------------------------------------------
-                # Para obtener el caudal por minuto de las balanzas, este if se debe ejecutar cada 1 min
-                if input('enter: ') == '1':
-                #if datetime.now().second == 00:
+                # Para obtener los kilogramos por minuto de las balanzas, este if se debe ejecutar cada 1 min
+                if datetime.now().second == 00:
+
                     #-------------------------------------------------------------------------
                     # Crear un diccionario vacío antes de empezar la iteración
                     diccionario_balanzas = {}
