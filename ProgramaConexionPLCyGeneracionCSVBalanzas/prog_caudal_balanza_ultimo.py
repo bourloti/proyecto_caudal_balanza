@@ -10,9 +10,8 @@ from modulos.paquete_clases.caudalBalanza import CaudalBalanzas
 def main():
     try:
         plc_molino = connect_to_plc("10.100.100.10", 0, 3)
-        #Diccionario con balanzas que se estan leyendo
         
-        # Diccionario con las rutas de los archivos CSV
+        # Diccionario con los nombre de las balanzas y las rutas con archivos CSV
         archivos = {
             'balanza_final_mb': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_final_molino_blanco.csv',
             'balanza_ingreso_mb': 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza\caudal_balanza_ingreso_molino_blanco.csv',
@@ -26,8 +25,8 @@ def main():
         }
                 
         objetos_caudal_balanzas = {nombre_balanza: CaudalBalanzas() for nombre_balanza in archivos.keys()}
-
-        objetos_genera_CSV_balanzas = {nombre_balanza: GenerarArchivoCSV(os.path.split(directorio)) for nombre_balanza, directorio in archivos.items()}
+        
+        objetos_genera_CSV_balanzas = {nombre_balanza: GenerarArchivoCSV(os.path.split(ruta)[1], os.path.split(ruta)[0]) for nombre_balanza, ruta in archivos.items()}
         
         while True:
             try:
@@ -36,10 +35,21 @@ def main():
                     print("Se perdió la conexión con el PLC. Reintentando...")
                     plc_molino = connect_to_plc("10.100.100.10", 0, 3)
 
-                #Leo los datos del PLC de las balanzas
                 '''
+                    Leo los datos del PLC de las balanzas, y los guardo en un diccionario donde los nombres de las balanzas deben ser iguales a los generados arriba
                     Con db_read obtengo el numero real, le paso 3 parametros: numeroDB,direccionDeArranque,cuantosByteLee
                 '''
+                # datos_leidos_plc = {
+                #     'balanza_final_mb': 20.4,
+                #     'balanza_ingreso_mb': 8.4,
+                #     'balanza_integral_mb': 3.4,
+                #     'balanza_final_mp': 54.5,
+                #     'balanza_ingreso_mp': 45.5,
+                #     'balanza_integral_mp': 4,
+                #     'balanza_silo_101': 5.8,
+                #     'balanza_tempering': 5.8,
+                #     'balanza_materia_prima': 54
+                # }
                 
                 datos_leidos_plc = {
                     'balanza_final_mb': round(get_real(plc_molino.db_read(153,8,4),0),1),
@@ -55,14 +65,25 @@ def main():
                 
 #-------------------------------------------------------------------------------------------------------------------------------
                 # Para obtener el caudal por minuto de las balanzas, este if se debe ejecutar cada 1 min
-                if datetime.now().second == 00:
+                if input('enter: ') == '1':
+                #if datetime.now().second == 00:
+                    #-------------------------------------------------------------------------
+                    # Crear un diccionario vacío antes de empezar la iteración
+                    diccionario_balanzas = {}
+                    # Iterar sobre el diccionario "objetos_caudal_balanzas" para obtener un df con hora y caudal (kg/min)
+                    for balanzas_nombre, balanzas_objeto in objetos_caudal_balanzas.items():
+                        if balanzas_nombre in datos_leidos_plc.keys():
+                            # Añadir el nombre_balanzas como clave y balanzas_objeto como valor al diccionario
+                            diccionario_balanzas[balanzas_nombre] = balanzas_objeto.obtiene_caudal(datos_leidos_plc[balanzas_nombre])
+                        else:
+                            print(f'No se encontro la {balanzas_nombre}')
+                    #-------------------------------------------------------------------------
+                    # Iterar sobre el diccionario "objetos_genera_CSV_balanzas" cargar los valores obtenidos en un CSV  
+                    for balanzas_nombre, balanzas_objetos in objetos_genera_CSV_balanzas.items():
+                        if balanzas_nombre in diccionario_balanzas.keys():
+                            balanzas_objetos.crear_csv(diccionario_balanzas[balanzas_nombre])
+                    #-------------------------------------------------------------------------
                     
-                    for nombre_balanzas, balanzas_objeto in objetos_caudal_balanzas.items():
-                        caudal_balanzas = {f'{nombre_balanzas}': balanzas_objeto.obtiene_caudal(datos_leidos_plc[nombre_balanzas])}
-                        
-                    for balanzas_objetos in objetos_genera_CSV_balanzas.values():
-                        balanzas_objetos.crearCSV(caudal_balanzas[nombre_balanzas])
-                   
                     sleep(1.5)
 #-------------------------------------------------------------------------------------------------------------------------------
                 sleep(0.1)
@@ -73,7 +94,7 @@ def main():
                 plc_molino = connect_to_plc("10.100.100.10", 0, 3)
 
     except KeyboardInterrupt:
-        # print("Comunicación Snap7 finalizada.")
+        print("Comunicación Snap7 finalizada.")
         plc_molino.disconnect()
         print("Conexión cerrada.")
 
