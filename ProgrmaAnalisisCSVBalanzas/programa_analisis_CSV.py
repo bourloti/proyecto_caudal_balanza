@@ -39,7 +39,7 @@ def main():
         try:
             df_por_hora_dia = []
             # Ejecutar el proceso a las 00:05:00
-            if input('Enter: ') == '1':
+            if input('1') == '1':
             #if str(datetime.now().strftime("%H:%M:%S")) == '00:05:00':
                 # Obtener la fecha de ayer para usarla en la búsqueda de datos
                 fecha_formateada = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
@@ -54,7 +54,7 @@ def main():
 
                     # Crear objeto de calculador para calcular las toneladas por día, crea un DataFrame con fecha y caudal por hora. Guarda el df en una lista, para luego poder graficarlos
                     calculador = CalculadorToneladasDia(df_acondicionado)
-                    df_por_hora_dia.append(calculador.calcular_toneladas_dia('2025-01-31'))
+                    df_por_hora_dia.append(calculador.calcular_toneladas_dia(fecha_formateada))
 
                     
                     # if df_dia_graficos is None:
@@ -62,23 +62,25 @@ def main():
 
                 #-------------------------------------------------------------------------------------------------------
                 # Si los datos fueron calculados correctamente, graficar los resultados
-                for i in range(len(df_por_hora_dia)):
-                    graficador = Graficador(df_por_hora_dia[i], balanzas_nombre[i].upper())
-                    graficador.graficar(fecha_formateada)
+                # for i in range(len(df_por_hora_dia)):
+                #     graficador = Graficador(df_por_hora_dia[i], balanzas_nombre[i].upper())
+                #     graficador.graficar(fecha_formateada)
                 #-------------------------------------------------------------------------------------------------------
 
                 #-------------------------------------------------------------------------------------------------------
                 # Crea un archivo CSV con los datos de fecha y totalizador balanza por hora
                 df_totalizadores_balanzas = generar_df_totalizadores_balanzas(df_por_hora_dia, balanzas_nombre)
-                totalizadores_por_hora = GenerarArchivoCSV('totalizadores_todas_balanzas.csv', 'D:\Mantenimiento\Bourlot Ignacio\GitHub repositorios\caudal_balanzas\proyecto_caudal_balanza')
+                totalizadores_por_hora = GenerarArchivoCSV('totalizadores_todas_balanzas.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
                 totalizadores_por_hora.crear_csv(df_totalizadores_balanzas) 
 
-                df = pd.read_csv("totalizadores_todas_balanzas.csv")
+                df = pd.read_csv("C:\\ProyectoIIOT\\Repositorio GitHub\\caudal_balanzas\\proyecto_caudal_balanza\\totalizadores_todas_balanzas.csv")
                 # Eliminar filas duplicadas (mantiene la primera ocurrencia por defecto)
                 df_sin_duplicados = df.drop_duplicates()
                 # Guardar el nuevo CSV sin duplicados
-                df_sin_duplicados.to_csv("totalizadores_todas_balanzas.csv", index=False)
+                df_sin_duplicados.to_csv("C:\\ProyectoIIOT\\Repositorio GitHub\\caudal_balanzas\\proyecto_caudal_balanza\\totalizadores_todas_balanzas.csv", index=False)
                 #-------------------------------------------------------------------------------------------------------
+
+                sleep(82800)
 
         except KeyboardInterrupt:
             print("Proceso interrumpido por el usuario.")

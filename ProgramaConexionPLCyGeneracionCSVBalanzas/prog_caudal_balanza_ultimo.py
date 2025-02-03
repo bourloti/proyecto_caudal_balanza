@@ -42,18 +42,7 @@ def main():
                     Leo los datos del PLC de las balanzas, y los guardo en un diccionario donde los nombres de las balanzas deben ser iguales a los generados arriba
                     Con db_read obtengo el numero real, le paso 3 parametros: numeroDB,direccionDeArranque,cuantosByteLee
                 '''
-                # datos_leidos_plc = {
-                #     'balanza_final_mb': 20.4,
-                #     'balanza_ingreso_mb': 8.4,
-                #     'balanza_integral_mb': 3.4,
-                #     'balanza_final_mp': 54.5,
-                #     'balanza_ingreso_mp': 45.5,
-                #     'balanza_integral_mp': 4,
-                #     'balanza_silo_101': 5.8,
-                #     'balanza_tempering': 5.8,
-                #     'balanza_materia_prima': 54
-                # }
-                
+              
                 datos_leidos_plc = {
                     'balanza_final_mb': round(get_real(plc_molino.db_read(153,8,4),0),1),
                     'balanza_ingreso_mb': round(get_real(plc_molino.db_read(152,8,4),0),1),
