@@ -14,15 +14,20 @@ def generar_df_totalizadores_balanzas(df_dia, titulo):
     for i in range(len(df_dia)):
         # Genera un nombre para la balanza (puedes personalizar esto si tienes nombres específicos)
         nombre_balanza = f'{titulo[i]}'  # Nombres como 'balanza_1', 'balanza_2', etc.
-        
+        #print(df_dia[i])
+        #print(nombre_balanza)
         # Crea las listas de toneladas y fechas
         lista_toneladas_totales = list(df_dia[i]['totalizador'])
         lista_fechas = list(df_dia[i]['fecha'])
+        #print(lista_toneladas_totales)
 
         # Agregar las fechas y toneladas al diccionario
         diccionario_balanzas[f'fecha_{nombre_balanza}'] = lista_fechas
         diccionario_balanzas[f'toneladas_{nombre_balanza}'] = lista_toneladas_totales
-        
-        df = pd.DataFrame(diccionario_balanzas)
+        print(len(lista_fechas))
+        print(len(lista_toneladas_totales))
+        print(nombre_balanza)
+    df = pd.DataFrame(diccionario_balanzas)
+    print(df)
         
     return df

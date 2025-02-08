@@ -44,6 +44,7 @@ def main():
                 # Obtener la fecha de ayer para usarla en la búsqueda de datos
                 fecha_formateada = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
 
+
                 # Acondicionar los datos de cada archivo CSV, recorro el diccionario creado con los objetos, y la variable balanza va tomando los objetos en cada iteracion
                 for balanza in objetos_balanzas.values():
                     df_acondicionado = balanza.acondicionar_archivo_CSV()
@@ -54,7 +55,7 @@ def main():
 
                     # Crear objeto de calculador para calcular las toneladas por día, crea un DataFrame con fecha y caudal por hora. Guarda el df en una lista, para luego poder graficarlos
                     calculador = CalculadorToneladasDia(df_acondicionado)
-                    df_por_hora_dia.append(calculador.calcular_toneladas_dia(fecha_formateada))
+                    df_por_hora_dia.append(calculador.calcular_toneladas_dia('2025-02-07'))
 
                     
                     # if df_dia_graficos is None:
@@ -69,8 +70,12 @@ def main():
 
                 #-------------------------------------------------------------------------------------------------------
                 # Crea un archivo CSV con los datos de fecha y totalizador balanza por hora
+                #print(df_por_hora_dia)
+                # print(balanzas_nombre)
                 df_totalizadores_balanzas = generar_df_totalizadores_balanzas(df_por_hora_dia, balanzas_nombre)
+                print(df_totalizadores_balanzas)
                 totalizadores_por_hora = GenerarArchivoCSV('totalizadores_todas_balanzas.csv', 'C:\ProyectoIIOT\Repositorio GitHub\caudal_balanzas\proyecto_caudal_balanza')
+
                 totalizadores_por_hora.crear_csv(df_totalizadores_balanzas) 
 
                 df = pd.read_csv("C:\\ProyectoIIOT\\Repositorio GitHub\\caudal_balanzas\\proyecto_caudal_balanza\\totalizadores_todas_balanzas.csv")
@@ -79,7 +84,7 @@ def main():
                 # Guardar el nuevo CSV sin duplicados
                 df_sin_duplicados.to_csv("C:\\ProyectoIIOT\\Repositorio GitHub\\caudal_balanzas\\proyecto_caudal_balanza\\totalizadores_todas_balanzas.csv", index=False)
                 #-------------------------------------------------------------------------------------------------------
-
+                break
                 sleep(82800)
 
         except KeyboardInterrupt:
